@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الکتریکی دهانی | فروشگاه آنلاین</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:#f4f6f8;color:#17212b;line-height:1.8}header{background:#101820;color:#fff;padding:18px 4%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header h1{font-size:22px;margin:0}header a,.btn{background:#ffc928;color:#111;border:0;border-radius:10px;padding:10px 14px;font-weight:bold;cursor:pointer;text-decoration:none}.hero{padding:28px 4%;background:#182633;color:white}.hero h2{margin:0 0 8px}.wrap{max-width:1100px;margin:auto;padding:22px 4%}.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.tools input{flex:1;min-width:180px;padding:12px;border:1px solid #ccd3db;border-radius:10px;font:inherit}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}.card{background:white;border:1px solid #e1e6eb;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}.card img{width:100%;height:155px;object-fit:cover;background:#e9edf1}.card .body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}.card h3{margin:0;font-size:18px}.muted{color:#667381;font-size:13px}.price{font-weight:bold;color:#087448}.card button{margin-top:auto}.panel{background:white;padding:18px;border-radius:14px;margin-top:24px;border:1px solid #e1e6eb}.panel h2{margin-top:0}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.row input,.row textarea,.row select{width:100%;padding:11px;border:1px solid #ccd3db;border-radius:9px;font:inherit}.row textarea{min-height:72px}.cartitem{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #eee}.danger{background:#c93d3d;color:white}.green{background:#168a55;color:white}.notice{background:#fff6d8;padding:12px;border-radius:10px;font-size:13px}.empty{padding:25px;text-align:center;color:#667381}.hidden{display:none}footer{text-align:center;padding:25px;color:#667381}
+</style></head>
+<body>
+<header><h1>⚡ الکتریکی دهانی</h1><a href="#order">سبد سفارش (<span id="cartCount">0</span>)</a></header>
+<section class="hero"><h2>لوازم برق‌کشی و روشنایی خانه</h2><div>ایرانشهر • سیم برق، لامپ، کلید و پریز، محافظ و لوازم برقی</div></section>
+<main class="wrap">
+<div class="tools"><input id="search" placeholder="جست‌وجوی محصول…"></div>
+<div id="products" class="grid"><div class="empty">در حال دریافت محصولات…</div></div>
+<section class="panel" id="order"><h2>🛒 سبد سفارش</h2><div id="cartItems" class="empty">هنوز محصولی انتخاب نکرده‌ای.</div><form id="checkout">
+<div class="row"><input id="customerName" placeholder="نام مشتری" required><input id="customerContact" placeholder="آیدی تلگرام یا راه ارتباطی" required></div>
+<div class="row" style="margin-top:10px"><select id="delivery"><option>هماهنگی با فروشگاه</option><option>تحویل حضوری</option><option>ارسال با پیک/پست</option></select><input id="address" placeholder="آدرس یا توضیحات (اختیاری)"></div>
+<p class="notice">قیمت و موجودی نهایی پس از ثبت سفارش توسط فروشگاه تأیید می‌شود. پرداخت آنلاین در این نسخه فعال نیست.</p>
+<button class="btn green" type="submit" id="submitOrder">ثبت سفارش و ارسال به فروشگاه</button>
+</form></section>
+</main><footer>الکتریکی دهانی • برای مدیریت کالاها وارد <a href="/admin.html">پنل مدیریت</a> شوید.</footer>
+<script>
+const $=id=>document.getElementById(id);let products=[],cart={};
+const fallbackImg='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="350"><rect width="100%" height="100%" fill="#e9edf1"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="32" fill="#6b7785">الکتریکی دهانی</text></svg>');
+function money(v){return Number(v||0).toLocaleString('fa-IR')+' تومان'}
+async function load(){try{let r=await fetch('/api/products');let d=await r.json();products=d.products||[]}catch(e){products=[]}render()}
+function render(){let term=$('search').value.trim().toLowerCase();let shown=products.filter(p=>(p.name+' '+(p.category||'')+' '+(p.description||'')).toLowerCase().includes(term));$('products').innerHTML=shown.length?shown.map(p=>`<article class="card"><img src="${esc(p.image||'')}" onerror="this.src='${fallbackImg}'" alt=""><div class="body"><h3>${esc(p.name)}</h3><div class="muted">${esc(p.category||'')}</div><div>${esc(p.description||'')}</div><div class="price">${Number(p.price)>0?money(p.price):'قیمت: تماس بگیرید'}</div><div class="muted">${p.stock===0?'ناموجود':p.stock>0?'موجودی: '+p.stock:'برای موجودی تماس بگیرید'}</div><button class="btn" onclick="add('${String(p.id).replace(/'/g,'')}')" ${p.stock===0?'disabled':''}>افزودن به سبد</button></div></article>`).join(''):'<div class="empty">محصولی ثبت نشده یا نتیجه‌ای پیدا نشد.</div>';renderCart()}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function add(id){cart[id]=(cart[id]||0)+1;renderCart()}
+function renderCart(){let entries=Object.entries(cart).filter(([id,q])=>q>0&&products.some(p=>String(p.id)===id));$('cartCount').textContent=entries.reduce((s,[,q])=>s+q,0);$('cartItems').innerHTML=entries.length?entries.map(([id,q])=>{let p=products.find(x=>String(x.id)===id);return `<div class="cartitem"><span>${esc(p.name)} × ${q}</span><span><button type="button" onclick="qty('${id}',-1)">−</button> <button type="button" onclick="qty('${id}',1)">+</button></span></div>`}).join(''):'هنوز محصولی انتخاب نکرده‌ای.'}
+function qty(id,n){cart[id]=(cart[id]||0)+n;if(cart[id]<=0)delete cart[id];renderCart()}
+$('search').addEventListener('input',render);
+$('checkout').addEventListener('submit',async e=>{e.preventDefault();let items=Object.entries(cart).filter(([id,q])=>q>0).map(([id,quantity])=>({id,name:products.find(p=>String(p.id)===id)?.name||'محصول',quantity}));if(!items.length){alert('اول محصولی به سبد اضافه کن.');return}let b=$('submitOrder');b.disabled=true;b.textContent='در حال ارسال…';try{let r=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('customerName').value.trim(),contact:$('customerContact').value.trim(),delivery:$('delivery').value,address:$('address').value.trim(),items})});let d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'خطا');alert('سفارش ارسال شد؛ فروشگاه برای تأیید قیمت و موجودی هماهنگ می‌کند.');cart={};renderCart();e.target.reset()}catch(err){alert('ارسال سفارش ناموفق بود. تنظیمات تلگرام و انتشار سایت باید کامل شود.')}finally{b.disabled=false;b.textContent='ثبت سفارش و ارسال به فروشگاه'}});
+load();
+</script></body></html>
